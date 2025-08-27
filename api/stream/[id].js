@@ -20,16 +20,17 @@ export default async function handler(req, res) {
 
     const playlist = await upstreamResp.text();
 
-    // Rewrite .ts segment URLs with ?segment= prefix
-    const updatedPlaylist = playlist.split(/\r?\n/).map((line) => {
-      const t = line.trim();
-      if (!t || t.startsWith("#")) return line; // keep tags as-is
-      if (t.endsWith(".ts")) {
-        // Add ?segment= prefix
-        return `?segment=${encodeURIComponent(t)}`;
-      }
-      return line;
-    }).join("\n");
+// Example for RESTREAM
+const updatedPlaylist = playlist.split(/\r?\n/).map((line) => {
+  const t = line.trim();
+  if (!t || t.startsWith("#")) return line; // keep tags
+  if (t.endsWith(".ts")) {
+    // rewrite URL to go through /api/segment
+    return `/api/segment?url=${encodeURIComponent(t)}`;
+  }
+  return line;
+}).join("\n");
+
 
 
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
