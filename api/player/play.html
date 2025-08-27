@@ -102,7 +102,7 @@
             }
 
             // Build final stream URL
-            const streamUrl = `https://restream-freeflix.vercel.app/api/player/${streamId}.m3u8`;
+            const streamUrl = `https://restream-freeflix.vercel.app/api/stream/${streamId}.m3u8`;
 
             if (Hls.isSupported()) {
                 const hlsConfig = { maxMaxBufferLength: 10 };
