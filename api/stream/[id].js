@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     streamId = String(streamId).replace(/\.m3u8$/i, "");
 
     // Original playlist URL
-    const sourceUrl = `https://restream-freeflix.vercel.app/api/opplex/${streamId}.m3u8`;
+    const sourceUrl = `https://restream-freeflix.vercel.app/api/mac/${streamId}.m3u8`;
 
     // Fetch the original playlist
     const upstreamResp = await fetch(sourceUrl, { redirect: "follow" });
