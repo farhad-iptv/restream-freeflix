@@ -83,60 +83,62 @@
         <!-- Source will be dynamically added via JavaScript -->
     </video>
 
-    <script>
-        setTimeout(videovisible, 3000);
+<script>
+    setTimeout(videovisible, 3000);
 
-        function videovisible() {
-            document.getElementById('loading').style.display = 'none';
+    function videovisible() {
+        document.getElementById('loading').style.display = 'none';
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const video = document.getElementById("videoPlayer");
+        const urlParams = new URLSearchParams(window.location.search);
+        const streamId = urlParams.get('id');
+        const server = urlParams.get('server') || "opplex"; // default to opplex
+        const playerOptions = {};
+
+        if (!streamId) {
+            alert("No stream ID provided.");
+            return;
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const video = document.getElementById("videoPlayer");
-            const urlParams = new URLSearchParams(window.location.search);
-            const streamId = urlParams.get('id');
-            const playerOptions = {};
+        // Build final stream URL with server parameter
+        const streamUrl = `api/stream/${streamId}.m3u8?server=${encodeURIComponent(server)}`;
 
-            if (!streamId) {
-                alert("No stream ID provided.");
-                return;
-            }
-
-            // Build final stream URL
-            const streamUrl = `api/stream/${streamId}.m3u8`;
-
-            if (Hls.isSupported()) {
-                const hlsConfig = { maxMaxBufferLength: 10 };
-                const hls = new Hls(hlsConfig);
-                hls.loadSource(streamUrl);
-                hls.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
-                    const qualities = hls.levels.map(level => level.height);
-                    playerOptions.quality = {
-                        default: qualities[0],
-                        options: qualities,
-                        forced: true,
-                        onChange: quality => {
-                            hls.levels.forEach((level, index) => {
-                                if (level.height === quality) {
-                                    hls.currentLevel = index;
-                                }
-                            });
-                        }
-                    };
-                    new Plyr(video, playerOptions);
-                });
-                hls.attachMedia(video);
-                window.hls = hls;
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                // Safari native HLS
-                video.src = streamUrl;
-                video.addEventListener('loadedmetadata', () => {
-                    video.play();
-                });
+        if (Hls.isSupported()) {
+            const hlsConfig = { maxMaxBufferLength: 10 };
+            const hls = new Hls(hlsConfig);
+            hls.loadSource(streamUrl);
+            hls.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
+                const qualities = hls.levels.map(level => level.height);
+                playerOptions.quality = {
+                    default: qualities[0],
+                    options: qualities,
+                    forced: true,
+                    onChange: quality => {
+                        hls.levels.forEach((level, index) => {
+                            if (level.height === quality) {
+                                hls.currentLevel = index;
+                            }
+                        });
+                    }
+                };
                 new Plyr(video, playerOptions);
-            } else {
-                alert("HLS not supported on this browser.");
-            }
-        });
-    </script>
+            });
+            hls.attachMedia(video);
+            window.hls = hls;
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            // Safari native HLS
+            video.src = streamUrl;
+            video.addEventListener('loadedmetadata', () => {
+                video.play();
+            });
+            new Plyr(video, playerOptions);
+        } else {
+            alert("HLS not supported on this browser.");
+        }
+    });
+</script>
+
 </body>
 </html>
