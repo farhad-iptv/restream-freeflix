@@ -18,8 +18,8 @@ export default async function handler(req, res) {
       headers: {
         "User-Agent": "curl/7.81.0",
         "Accept": "*/*",
-        "Referer": "http://31.220.3.103:2095",
-        "Origin": "http://31.220.3.103:2095"
+        "Referer": "http://line.iptvwings.com:80",
+        "Origin": "http://line.iptvwings.com:80"
       }
     });
 
