@@ -474,7 +474,7 @@
         playerLogo.style.display='none';
       }
       // Embed player.php with encoded URL
-      const src = `clappr.html?id=${encodeURIComponent(ch.url)}&server=opplex`;
+      const src = `player.html?id=${encodeURIComponent(ch.url)}&server=opplex`;
       if(playerFrame.src !== src) playerFrame.src = src;
 
       buildSuggestions(ch);
