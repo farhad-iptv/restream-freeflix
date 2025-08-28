@@ -9,8 +9,8 @@ export default async function handler(req, res) {
     streamId = String(streamId).replace(/\.m3u8$/i, "");
 
     // MAC portal base URL
-    const macAddress = "00:1A:79:B8:FB:11"; // replace with actual MAC if needed
-    const sourceUrl = `http://skunkytv.live:80/play/live.php?mac=${macAddress}&stream=${streamId}&extension=.m3u8`;
+    const macAddress = "00:1A:79:76:B3:F5"; // replace with actual MAC if needed
+    const sourceUrl = `http://line.iptvwings.com:80/play/live.php?mac=${macAddress}&stream=${streamId}&extension=.m3u8`;
 
     // Fetch playlist from MAC portal
     const upstreamResp = await fetch(sourceUrl, {
