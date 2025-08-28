@@ -243,7 +243,7 @@
     init();
     async function init(){
       try{
-        const res = await fetch('mac2.m3u', {cache:'no-store'});
+        const res = await fetch('mac2/mac2.m3u', {cache:'no-store'});
         if(!res.ok) throw new Error('Failed to load playlist.m3u');
         const text = await res.text();
         state.channels = parseM3U(text);
