@@ -1,0 +1,145 @@
+<html>
+<head>
+    <title>Player - FREEFLIX</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/clappr/latest/clappr.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/clappr.level-selector/latest/level-selector.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@clappr/hlsjs-playback@1.0.1/dist/hlsjs-playback.min.js"></script>
+
+    <style>
+
+body{margin:0}[data-player]{width:100%!important;height:100%!important}.spinner-three-bounce[data-spinner]{width:150px!important}.spinner-three-bounce[data-spinner]>div{width:50px!important;height:50px!important;box-shadow:0 0 30px}.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar] .bar-background[data-seekbar]{height:2px!important}.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover .bar-background[data-seekbar]{height:3px!important}.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]{top:-21px!important}.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover{top:-22px!important}.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar] .bar-scrubber[data-seekbar] .bar-scrubber-icon[data-seekbar]{top:11px!important;width:0!important;height:0!important;box-shadow:none!important;transition:.3s!important}.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover .bar-scrubber[data-seekbar] .bar-scrubber-icon[data-seekbar]{top:4px!important;width:15px!important;height:15px!important;box-shadow:0 0 0 6px hsla(0,0,100%,.2)!important}.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover .bar-scrubber[data-seekbar] .bar-scrubber-icon[data-seekbar]{top:5px!important}.seek-time[data-seek-time] [data-duration]{color:#777!important;font-size:12px!important}.seek-time[data-seek-time] [data-seek-time]{color:#000!important;font-size:11px!important}.seek-time[data-seek-time]{background-color:#fff!important}.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar] .bar-background[data-seekbar] .bar-fill-1[data-seekbar]{background-color:transparent!important}.media-control[data-media-control] .media-control-layer[data-controls] .drawer-container[data-volume] .drawer-icon-container[data-volume] .drawer-icon[data-volume] svg{height:32px!important;top:-1px!important}.media-control[data-media-control] .media-control-layer[data-controls] .drawer-container[data-volume] .drawer-icon-container[data-volume] .drawer-icon[data-volume]{width:32px!important;height:40px!important}.media-control[data-media-control] .media-control-icon{opacity:.8!important}.media-control[data-media-control] .media-control-icon:hover{opacity:1!important}[data-watermark]{top:4px!important;left:2px!important;float:left!important;opacity:.66!important;transition:.3s;overflow:hidden;width:100px!important} .sticky-container{
+    padding:0px;
+    margin:0px;
+    position:fixed;
+    right:-130px;
+    top: 3px;
+    width:210px;
+    z-index: 1100;
+}
+
+
+        #watermark {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            opacity: 0.7;
+            z-index: 10;
+        }
+
+        #watermark a {
+            color: white;
+            text-decoration: none;
+        }
+
+        #watermark a:hover {
+            text-decoration: underline;
+        }
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+        }
+        .loading-text {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+            text-align: center;
+            width: 100%;
+            height: 100px;
+            line-height: 100px;
+        }
+        .loading-text span {
+            display: inline-block;
+            margin: 0 5px;
+            color: #07f32e;
+            font-family: 'Quattrocento Sans', sans-serif;
+            filter: blur(0px);
+            animation: blur-text 1.5s infinite linear alternate;
+        }
+        .loading-text span:nth-child(odd) {
+            animation-delay: 0.2s;
+        }
+        .loading-text span:nth-child(even) {
+            animation-delay: 0.4s;
+        }
+        @keyframes blur-text {
+            0% { filter: blur(0px); }
+            100% { filter: blur(4px); }
+        }
+        #player {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+<div id="loading" class="loading">
+        <div class="loading-text">
+            <span>F</span>
+            <span>R</span>
+            <span>E</span> 
+            <span>E</span>
+            <span> </span>
+            <span>F</span>
+            <span>L</span>
+            <span>I</span>
+            <span>x</span>
+        </div>
+    </div>
+    <div id="player"></div>
+
+    <!-- Watermark Text with Hyperlink -->
+   
+<script>
+    setTimeout(() => {
+        document.getElementById('loading').style.display = 'none';
+    }, 3000);
+
+    // Get the URL parameter
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    var streamId = getQueryParam('id');
+    var server = getQueryParam('server');
+
+    if (!streamId || !server) {
+        console.error("Missing id or server parameter in URL.");
+    } else {
+        const streamUrl = `api/stream/${streamId}.m3u8?server=${encodeURIComponent(server)}`;
+
+        var player = new Clappr.Player({
+            source: streamUrl,
+            width: '100%',
+            height: '100%',
+            autoPlay: true,
+            plugins: [HlsjsPlayback, LevelSelector],
+            mimeType: "application/x-mpegURL",
+            mediacontrol: { 
+                seekbar: "#ff0000", 
+                buttons: "#eee",
+                volume: true  
+            },
+            parentId: "#player",
+            volume: 0.5  
+        });
+    }
+</script>
+
+</body>
+</html>
