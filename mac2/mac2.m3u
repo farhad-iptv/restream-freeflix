@@ -1,5 +1,5 @@
 #EXTM3U
-#EXTINF:-1 tvg-id="978715" tvg-logo="http://103.176.90.95/images/978715.png" group-title="Live",EN| CHRISTMAS 1 4K
+#EXTINF:-1 tvg-id="978715" tvg-logo="api/segment?url=http://103.176.90.95/images/978715.png" group-title="Live",EN| CHRISTMAS 1 4K
 978715
 #EXTINF:-1 tvg-id="978714" tvg-logo="http://103.176.90.95/images/978714.png" group-title="Live",EN| CHRISTMAS 2 4K
 978714
