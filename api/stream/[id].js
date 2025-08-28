@@ -8,8 +8,13 @@ export default async function handler(req, res) {
 
     streamId = String(streamId).replace(/\.m3u8$/i, "");
 
-    // Original playlist URL
-    const sourceUrl = `https://restream-freeflix.vercel.app/api/opplex/${streamId}.m3u8`;
+    // Get server parameter
+    let server = req.query?.server ?? "opplex"; // default to "opplex"
+    if (Array.isArray(server)) server = server[0];
+    server = String(server).trim();
+
+    // Original playlist URL (dynamic server + id)
+    const sourceUrl = `https://restream-freeflix.vercel.app/api/${server}/${streamId}.m3u8`;
 
     // Fetch the original playlist
     const upstreamResp = await fetch(sourceUrl, { redirect: "follow" });
@@ -20,22 +25,22 @@ export default async function handler(req, res) {
 
     const playlist = await upstreamResp.text();
 
-// Example for RESTREAM
-const updatedPlaylist = playlist.split(/\r?\n/).map((line) => {
-  const t = line.trim();
-  if (!t || t.startsWith("#")) return line; // keep tags
-  if (t.endsWith(".ts")) {
-    // rewrite URL to go through /api/segment
-    return `/api/segment?url=${encodeURIComponent(t)}`;
-  }
-  return line;
-}).join("\n");
-
-
+    // Example for RESTREAM
+    const updatedPlaylist = playlist
+      .split(/\r?\n/)
+      .map((line) => {
+        const t = line.trim();
+        if (!t || t.startsWith("#")) return line; // keep tags
+        if (t.endsWith(".ts")) {
+          // rewrite URL to go through /api/segment
+          return `/api/segment?url=${encodeURIComponent(t)}`;
+        }
+        return line;
+      })
+      .join("\n");
 
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     return res.status(200).send(updatedPlaylist);
-
   } catch (err) {
     console.error("Server error:", err);
     return res.status(500).send("Server error: " + (err.message || err));
