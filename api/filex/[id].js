@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     id = String(id).replace(/\.m3u8$/i, "");
 
     // Xtream Codes base URL (your source)
-    const baseXtream = "http://filex.tv:8080/live/%40singh_tesla_7207492/puWnhEGsXpK3";
+    const baseXtream = "http://filex.me:8080/live/000003/000003";
     const sourceUrl = `${baseXtream}/${id}.m3u8`;
 
     // Fetch upstream with curl-like headers
