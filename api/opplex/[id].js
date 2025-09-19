@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     id = String(id).replace(/\.m3u8$/i, "");
 
     // Xtream Codes base URL (your source)
-    const baseXtream = "http://opplex.tv:8080/live/537890/3322";
+    const baseXtream = "http://xott.live:8080/live/Mujahid.pak%402023/Mujahid%402017";
     const sourceUrl = `${baseXtream}/${id}.m3u8`;
 
     // Fetch upstream with curl-like headers
