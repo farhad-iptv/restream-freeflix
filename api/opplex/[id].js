@@ -1,7 +1,7 @@
 // api/BDIX/[id].js
 export default async function handler(req, res) {
   try {
-    // Get ID from URL (either /api/BDIX/244978.m3u8 or ?id=244978)
+    // Get ID from URL (/api/BDIX/244978.m3u8 or ?id=244978)
     let id = req.query?.id ?? null;
     if (Array.isArray(id)) id = id[0];
     if (!id && typeof req.query === "object") id = req.query.id;
@@ -11,35 +11,54 @@ export default async function handler(req, res) {
     id = String(id).replace(/\.m3u8$/i, "");
 
     // Xtream Codes base URL (your source)
-    const baseXtream = "http://xott.live:8080/live/Mujahid.pak%402023/Mujahid%402017";
+    const baseXtream =
+      "http://xott.live:8080/live/Mujahid.pak%402023/Mujahid%402017";
     const sourceUrl = `${baseXtream}/${id}.m3u8`;
 
-    // Fetch upstream with curl-like headers
+    // Fetch upstream with browser-like headers
     const upstreamResp = await fetch(sourceUrl, {
       redirect: "follow",
       headers: {
-        "User-Agent": "curl/7.81.0", // mimic PHP curl
-        "Accept": "*/*",
-        "Referer": "http://xott.live",
-        "Origin": "http://xott.live"
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
+          "AppleWebKit/537.36 (KHTML, like Gecko) " +
+          "Chrome/124.0.0.0 Safari/537.36",
+        "Accept":
+          "text/html,application/xhtml+xml,application/xml;q=0.9," +
+          "image/avif,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Referer": "http://xott.live/",
+        "Origin": "http://xott.live",
+        "Upgrade-Insecure-Requests": "1",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-User": "?1"
       }
     });
 
-    // Handle errors (debug mode)
+    // Handle errors
     if (!upstreamResp.ok) {
       const errText = await upstreamResp.text();
       const errHeaders = Object.fromEntries(upstreamResp.headers.entries());
 
-      console.error("⚠️ Upstream error", upstreamResp.status, errHeaders, errText);
+      console.error(
+        "⚠️ Upstream error",
+        upstreamResp.status,
+        errHeaders,
+        errText
+      );
 
       return res.status(upstreamResp.status).send(
         `Upstream returned ${upstreamResp.status}\n\n` +
-        `--- HEADERS ---\n${JSON.stringify(errHeaders, null, 2)}\n\n` +
-        `--- BODY ---\n${errText}`
+          `--- HEADERS ---\n${JSON.stringify(errHeaders, null, 2)}\n\n` +
+          `--- BODY ---\n${errText}`
       );
     }
 
-    // Final resolved URL (after redirects)
+    // Final resolved URL
     const finalUrl = upstreamResp.url;
     if (!finalUrl) return res.status(500).send("Failed to resolve redirect.");
 
@@ -47,7 +66,9 @@ export default async function handler(req, res) {
 
     // Build base URL (scheme://host[:port])
     const u = new URL(finalUrl);
-    const baseUrl = `${u.protocol}//${u.hostname}${u.port ? ":" + u.port : ""}`;
+    const baseUrl = `${u.protocol}//${u.hostname}${
+      u.port ? ":" + u.port : ""
+    }`;
 
     const isAbsolute = (s) =>
       s.startsWith("http://") ||
@@ -55,7 +76,7 @@ export default async function handler(req, res) {
       s.startsWith("//") ||
       s.startsWith("data:");
 
-    // Replace URIs inside quotes (like URI="key.key", init.mp4, ts, etc.)
+    // Replace URIs inside quotes (keys, segments, etc.)
     playlist = playlist.replace(
       /(["'])([^"']+\.(?:ts|m4s|mp4|key|aac|m3u8)(?:\?[^"']*)?)\1/gi,
       (match, quote, url) => {
@@ -67,7 +88,7 @@ export default async function handler(req, res) {
       }
     );
 
-    // Fix plain segment lines (not starting with #)
+    // Fix plain segment lines
     const lines = playlist.split(/\r?\n/).map((ln) => {
       const t = ln.trim();
       if (!t || t.startsWith("#")) return ln;
@@ -81,10 +102,9 @@ export default async function handler(req, res) {
     const finalPlaylist = lines.join("\n");
 
     // Send result
-   
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Content-Type", "application/vnd.apple.mpegurl");
     return res.status(200).send(finalPlaylist);
-
   } catch (err) {
     console.error("⚠️ Server error", err);
     return res.status(500).send("Server error: " + (err.message || err));
