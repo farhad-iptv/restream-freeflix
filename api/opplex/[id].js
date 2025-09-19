@@ -20,8 +20,8 @@ export default async function handler(req, res) {
       headers: {
         "User-Agent": "curl/7.81.0", // mimic PHP curl
         "Accept": "*/*",
-        "Referer": "http://opplex.tv/",
-        "Origin": "http://opplex.tv"
+        "Referer": "http://xott.live",
+        "Origin": "http://xott.live"
       }
     });
 
