@@ -9,8 +9,8 @@ export default async function handler(req, res) {
     streamId = String(streamId).replace(/\.m3u8$/i, "");
 
     // MAC portal base URL
-    const macAddress = "00:1A:79:01:CE:7F"; // replace with actual MAC if needed
-    const sourceUrl = `http://azers.online:80/play/live.php?mac=${macAddress}&stream=${streamId}&extension=.m3u8`;
+    const macAddress = "00:1A:79:84:EB:56"; // replace with actual MAC if needed
+    const sourceUrl = `http://main.light-ott.net:80/play/live.php?mac=${macAddress}&stream=${streamId}&extension=.m3u8`;
 
     // Fetch playlist from MAC portal
     const upstreamResp = await fetch(sourceUrl, {
@@ -18,8 +18,8 @@ export default async function handler(req, res) {
       headers: {
         "User-Agent": "curl/7.81.0",
         "Accept": "*/*",
-        "Referer": "http://azers.online:80",
-        "Origin": "http://azers.online:80"
+        "Referer": "http://main.light-ott.net:80",
+        "Origin": "http://main.light-ott.net:80"
       }
     });
 
